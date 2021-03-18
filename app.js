@@ -1,6 +1,11 @@
 const express = require("express");
+var exphbs = require("express-handlebars");
 
 const app = express();
+
+// Middleware
+app.engine("handlebars", exphbs());
+app.set("view engine", "handlebars");
 
 //Index Routing
 app.get("/", (req, res) => {

@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
 
 // About Routing
 app.get("/about", (req, res) => {
-  res.send("About");
+  res.render("about");
 });
 
 const port = 3000;

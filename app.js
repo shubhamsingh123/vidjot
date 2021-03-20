@@ -1,25 +1,25 @@
 const express = require("express");
-var exphbs = require("express-handlebars");
+const exphbs = require("express-handlebars");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 const app = express();
 
-// connect to mongoose
+// Map global promise - get rid of warning
+mongoose.Promise = global.Promise;
+// Connect to mongoose
 mongoose
   .connect("mongodb://localhost/vidjot-dev", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+    useMongoClient: true,
   })
-  .then(() => console.log("MONGODB CONNECTED..."))
+  .then(() => console.log("MongoDB Connected..."))
   .catch((err) => console.log(err));
 
 // Load Idea Model
 require("./models/Idea");
+const Idea = mongoose.model("ideas");
 
-const Idea = mongoose.models("ideas");
-
-// handlebars Middleware
+// Handlebars Middleware
 app.engine(
   "handlebars",
   exphbs({
@@ -28,35 +28,39 @@ app.engine(
 );
 app.set("view engine", "handlebars");
 
-//body parser
+// Body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-//Index Routing
+// Index Route
 app.get("/", (req, res) => {
-  res.render("index");
+  const title = "Welcome";
+  res.render("index", {
+    title: title,
+  });
 });
 
-// About Routing
+// About Route
 app.get("/about", (req, res) => {
   res.render("about");
 });
 
-// Add idea Form
+// Add Idea Form
 app.get("/ideas/add", (req, res) => {
   res.render("ideas/add");
 });
 
-// Process form
+// Process Form
 app.post("/ideas", (req, res) => {
   let errors = [];
 
   if (!req.body.title) {
-    errors.push({ title: "Please add a title" });
+    errors.push({ text: "Please add a title" });
   }
   if (!req.body.details) {
-    errors.push({ title: "Please add some details" });
+    errors.push({ text: "Please add some details" });
   }
+
   if (errors.length > 0) {
     res.render("ideas/add", {
       errors: errors,
@@ -64,12 +68,18 @@ app.post("/ideas", (req, res) => {
       details: req.body.details,
     });
   } else {
-    res.send("Passed");
+    const newUser = {
+      title: req.body.title,
+      details: req.body.details,
+    };
+    new Idea(newUser).save().then((idea) => {
+      res.redirect("/ideas");
+    });
   }
 });
 
 const port = 3000;
 
 app.listen(port, () => {
-  console.log(`The server is running in port no ${port}`);
+  console.log(`Server started on port ${port}`);
 });

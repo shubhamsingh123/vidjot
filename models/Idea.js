@@ -20,4 +20,4 @@ const IdeaSchema = new Schema({
   },
 });
 
-mongoose.models("ideas", IdeaSchema);
+mongoose.model("ideas", IdeaSchema);

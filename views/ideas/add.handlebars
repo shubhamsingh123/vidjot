@@ -1,4 +1,12 @@
-<div class="card car-body">
+{{#each errors}}
+
+<div class="alert alert-danger">{{text}}</div>
+
+{{#else}}
+{{/each}}
+
+
+<div class="card card-body">
   <h3>Video Idea</h3>
   <form action="/ideas" method='post'>
     <div class="form-group">
